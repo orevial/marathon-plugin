@@ -45,7 +45,7 @@ This plugin can be called as `marathon(...)` within a workflow job.
 marathon(
     url: 'http://marathon-instance',
     appid: 'someid',
-    docker: 'mesosphere/jenkins-dev')
+    docker: ['image':'mesosphere/jenkins-dev', 'forcePullImage': true])
 ```
 
 `url` is required and this still depends on a local "marathon.json" file.

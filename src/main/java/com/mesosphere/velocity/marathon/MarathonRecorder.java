@@ -35,9 +35,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class MarathonRecorder extends Recorder implements AppConfig {
@@ -48,14 +46,14 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     private       List<MarathonUri>   uris;
     private       List<MarathonLabel> labels;
     private       String              appid;
-    private       String              docker;
+    private       String              dockerImage;
+    private       Map<String, Object> docker = new HashMap<String, Object>();;
     private       String              filename;
     private       String              credentialsId;
 
     @DataBoundConstructor
     public MarathonRecorder(final String url) {
         this.url = MarathonBuilderUtils.rmSlashFromUrl(url);
-
         this.uris = new ArrayList<MarathonUri>(5);
         this.labels = new ArrayList<MarathonLabel>(5);
     }
@@ -185,13 +183,19 @@ public class MarathonRecorder extends Recorder implements AppConfig {
         return url;
     }
 
-    public String getDocker() {
-        return docker;
+    public Map<String, Object> getDocker() {
+        return this.docker;
+    }
+
+    public String getDockerImage() {
+        return this.dockerImage;
     }
 
     @DataBoundSetter
-    public void setDocker(@Nonnull final String docker) {
-        this.docker = docker;
+    public void setDockerImage(@Nonnull final String dockerImage) {
+        this.dockerImage = dockerImage;
+        this.docker.put("image", docker);
+        this.docker.put("forcePullImage", true);
     }
 
     public List<MarathonUri> getUris() {

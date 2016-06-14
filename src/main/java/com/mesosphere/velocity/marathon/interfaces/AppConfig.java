@@ -4,6 +4,7 @@ import com.mesosphere.velocity.marathon.fields.MarathonLabel;
 import com.mesosphere.velocity.marathon.fields.MarathonUri;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AppConfig {
     /**
@@ -21,11 +22,18 @@ public interface AppConfig {
     String getUrl();
 
     /**
+     * Get the configured docker map.
+     *
+     * @return Docker image name
+     */
+    Map<String, Object> getDocker();
+
+    /**
      * Get the configured docker image name.
      *
      * @return Docker image name
      */
-    String getDocker();
+    String getDockerImage();
 
     /**
      * Get the Jenkins credentials id for this configuration.

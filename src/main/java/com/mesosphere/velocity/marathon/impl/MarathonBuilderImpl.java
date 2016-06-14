@@ -22,6 +22,7 @@ import org.jenkinsci.plugins.plaincredentials.StringCredentials;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class MarathonBuilderImpl extends MarathonBuilder {
     private AppConfig  config;
@@ -55,7 +56,7 @@ public class MarathonBuilderImpl extends MarathonBuilder {
         return config.getAppId();
     }
 
-    public String getDocker() {
+    public Map<String, Object> getDocker() {
         return config.getDocker();
     }
 
@@ -158,7 +159,7 @@ public class MarathonBuilderImpl extends MarathonBuilder {
     }
 
     private JSONObject setDockerImage() {
-        if (config.getDocker() != null && config.getDocker().trim().length() > 0) {
+        if (config.getDocker() != null && config.getDocker().get("image") != null && config.getDocker().get("image").toString().trim().length() > 0) {
             // get container -> docker -> image
             if (!json.has(MarathonBuilderUtils.JSON_CONTAINER_FIELD)) {
                 json.element(MarathonBuilderUtils.JSON_CONTAINER_FIELD,
@@ -173,7 +174,10 @@ public class MarathonBuilderImpl extends MarathonBuilder {
 
             container.getJSONObject(MarathonBuilderUtils.JSON_DOCKER_FIELD)
                     .element(MarathonBuilderUtils.JSON_DOCKER_IMAGE_FIELD,
-                            Util.replaceMacro(config.getDocker(), envVars));
+                            Util.replaceMacro(config.getDocker().get("image").toString(), envVars));
+
+            container.getJSONObject(MarathonBuilderUtils.JSON_DOCKER_FIELD)
+                    .element(MarathonBuilderUtils.JSON_DOCKER_IMAGE_FORCE_PULL, config.getDocker().getOrDefault("forcePullImage", false));
         }
 
         return json;

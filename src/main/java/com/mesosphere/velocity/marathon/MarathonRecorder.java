@@ -195,7 +195,7 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     public void setDockerImage(@Nonnull final String dockerImage) {
         this.dockerImage = dockerImage;
         this.docker.put("image", docker);
-        this.docker.put("forcePullImage", true);
+        this.docker.put("forcePullImage", false);
     }
 
     public List<MarathonUri> getUris() {

@@ -52,11 +52,6 @@ public class MarathonStep extends AbstractStepImpl implements AppConfig {
     }
 
     @Override
-    public String getDockerImage() {
-        return null;
-    }
-
-    @Override
     public String getCredentialsId() {
         return credentialsId;
     }

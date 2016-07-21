@@ -35,7 +35,7 @@ public class MarathonBuilderUtils {
      */
     public static final String JSON_DOCKER_IMAGE_FIELD = "image";
     /**
-     * The docker force pull actio. This is found within the "docker" JSON object.
+     * The docker force pull action. This is found within the "docker" JSON object.
      */
     public static final String JSON_DOCKER_IMAGE_FORCE_PULL = "forcePullImage";
     /**

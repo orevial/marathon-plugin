@@ -29,13 +29,6 @@ public interface AppConfig {
     Map<String, Object> getDocker();
 
     /**
-     * Get the configured docker image name.
-     *
-     * @return Docker image name
-     */
-    String getDockerImage();
-
-    /**
      * Get the Jenkins credentials id for this configuration.
      *
      * @return credentials id

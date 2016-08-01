@@ -27,7 +27,7 @@ public class MarathonStep extends AbstractStepImpl implements AppConfig {
     private       List<String>        uris;
     private       Map<String, String> labels;   // this does not work :(
     private       String              appid;
-    private       String              docker;
+    private       Map<String, Object> docker;
     private       String              filename;
     private       String              credentialsId;
     private       boolean             forceUpdate;
@@ -48,17 +48,7 @@ public class MarathonStep extends AbstractStepImpl implements AppConfig {
         return url;
     }
 
-    @Override
-    public boolean getForceUpdate() {
-        return forceUpdate;
-    }
-
-    @DataBoundSetter
-    public void setForceUpdate(final boolean forceUpdate) {
-        this.forceUpdate = forceUpdate;
-    }
-
-    public String getDocker() {
+    public Map<String, Object> getDocker() {
         return docker;
     }
 
@@ -99,7 +89,7 @@ public class MarathonStep extends AbstractStepImpl implements AppConfig {
     }
 
     @DataBoundSetter
-    public void setDocker(final String docker) {
+    public void setDocker(final Map<String, Object> docker) {
         this.docker = docker;
     }
 

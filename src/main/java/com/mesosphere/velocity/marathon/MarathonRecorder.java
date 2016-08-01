@@ -1,5 +1,22 @@
 package com.mesosphere.velocity.marathon;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+
+import mesosphere.marathon.client.utils.MarathonException;
+
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
@@ -13,6 +30,7 @@ import com.mesosphere.velocity.marathon.fields.MarathonUri;
 import com.mesosphere.velocity.marathon.interfaces.AppConfig;
 import com.mesosphere.velocity.marathon.interfaces.MarathonBuilder;
 import com.mesosphere.velocity.marathon.util.MarathonBuilderUtils;
+
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Launcher;
@@ -23,22 +41,6 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import mesosphere.marathon.client.utils.MarathonException;
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Logger;
 
 public class MarathonRecorder extends Recorder implements AppConfig {
     @Extension
@@ -48,7 +50,8 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     private       List<MarathonUri>   uris;
     private       List<MarathonLabel> labels;
     private       String              appid;
-    private       String              docker;
+    private       String              dockerImage;
+    private       Map<String, Object> docker = new HashMap<String, Object>();;
     private       String              filename;
     private       String              credentialsId;
     private       boolean             forceUpdate;
@@ -56,7 +59,6 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     @DataBoundConstructor
     public MarathonRecorder(final String url) {
         this.url = MarathonBuilderUtils.rmSlashFromUrl(url);
-
         this.uris = new ArrayList<MarathonUri>(5);
         this.labels = new ArrayList<MarathonLabel>(5);
     }
@@ -177,13 +179,12 @@ public class MarathonRecorder extends Recorder implements AppConfig {
         return url;
     }
 
-    @Override
-    public boolean getForceUpdate() {
-        return forceUpdate;
+    public Map<String, Object> getDocker() {
+        return this.docker;
     }
 
-    public String getDocker() {
-        return docker;
+    public String getDockerImage() {
+        return this.dockerImage;
     }
 
     public String getCredentialsId() {
@@ -191,8 +192,10 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     }
 
     @DataBoundSetter
-    public void setCredentialsId(final String credentialsId) {
-        this.credentialsId = credentialsId;
+    public void setDockerImage(@Nonnull final String dockerImage) {
+        this.dockerImage = dockerImage;
+        this.docker.put("image", docker);
+        this.docker.put("forcePullImage", false);
     }
 
     public List<MarathonUri> getUris() {
@@ -211,20 +214,6 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     @DataBoundSetter
     public void setLabels(final List<MarathonLabel> labels) {
         this.labels = labels;
-    }
-
-    @DataBoundSetter
-    public void setDocker(@Nonnull final String docker) {
-        this.docker = docker;
-    }
-
-    /**
-     * Used by jelly or stapler to determine checkbox state.
-     *
-     * @return True if Force Update is enabled; False otherwise.
-     */
-    public boolean isForceUpdate() {
-        return getForceUpdate();
     }
 
     @DataBoundSetter

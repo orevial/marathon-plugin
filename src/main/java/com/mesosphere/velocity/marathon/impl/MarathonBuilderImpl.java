@@ -1,5 +1,19 @@
 package com.mesosphere.velocity.marathon.impl;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import mesosphere.marathon.client.Marathon;
+import mesosphere.marathon.client.MarathonClient;
+import mesosphere.marathon.client.model.v2.App;
+import mesosphere.marathon.client.utils.MarathonException;
+import mesosphere.marathon.client.utils.ModelUtils;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
+import org.jenkinsci.plugins.plaincredentials.StringCredentials;
+
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.mesosphere.velocity.marathon.exceptions.MarathonFileInvalidException;
 import com.mesosphere.velocity.marathon.exceptions.MarathonFileMissingException;
@@ -8,20 +22,10 @@ import com.mesosphere.velocity.marathon.fields.MarathonUri;
 import com.mesosphere.velocity.marathon.interfaces.AppConfig;
 import com.mesosphere.velocity.marathon.interfaces.MarathonBuilder;
 import com.mesosphere.velocity.marathon.util.MarathonBuilderUtils;
+
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Util;
-import mesosphere.marathon.client.Marathon;
-import mesosphere.marathon.client.MarathonClient;
-import mesosphere.marathon.client.model.v2.App;
-import mesosphere.marathon.client.utils.MarathonException;
-import mesosphere.marathon.client.utils.ModelUtils;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.plaincredentials.StringCredentials;
-
-import java.io.IOException;
-import java.util.List;
 
 public class MarathonBuilderImpl extends MarathonBuilder {
     private AppConfig  config;
@@ -55,7 +59,7 @@ public class MarathonBuilderImpl extends MarathonBuilder {
         return config.getAppId();
     }
 
-    public String getDocker() {
+    public Map<String, Object> getDocker() {
         return config.getDocker();
     }
 
@@ -68,7 +72,7 @@ public class MarathonBuilderImpl extends MarathonBuilder {
                     usercreds == null ? MarathonClient.getInstance(config.getUrl()) :
                             MarathonClient.getInstanceWithBasicAuth(config.getUrl(), usercreds.getUsername(), usercreds.getPassword().getPlainText()) :
                     MarathonClient.getInstanceWithTokenAuth(config.getUrl(), creds.getSecret().getPlainText());
-            marathon.updateApp(app.getId(), app, config.getForceUpdate());   // uses PUT
+            marathon.updateApp(app.getId(), app, true);   // uses PUT
         }
         return this;
     }
@@ -158,7 +162,7 @@ public class MarathonBuilderImpl extends MarathonBuilder {
     }
 
     private JSONObject setDockerImage() {
-        if (config.getDocker() != null && config.getDocker().trim().length() > 0) {
+        if (config.getDocker() != null && config.getDocker().get("image") != null && config.getDocker().get("image").toString().trim().length() > 0) {
             // get container -> docker -> image
             if (!json.has(MarathonBuilderUtils.JSON_CONTAINER_FIELD)) {
                 json.element(MarathonBuilderUtils.JSON_CONTAINER_FIELD,
@@ -173,7 +177,10 @@ public class MarathonBuilderImpl extends MarathonBuilder {
 
             container.getJSONObject(MarathonBuilderUtils.JSON_DOCKER_FIELD)
                     .element(MarathonBuilderUtils.JSON_DOCKER_IMAGE_FIELD,
-                            Util.replaceMacro(config.getDocker(), envVars));
+                            Util.replaceMacro(config.getDocker().get("image").toString(), envVars));
+
+            container.getJSONObject(MarathonBuilderUtils.JSON_DOCKER_FIELD)
+                    .element(MarathonBuilderUtils.JSON_DOCKER_IMAGE_FORCE_PULL, config.getDocker().getOrDefault("forcePullImage", false));
         }
 
         return json;

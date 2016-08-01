@@ -20,7 +20,7 @@
         <f:textbox />
     </f:entry>
 
-    <f:entry title="${%Docker Image}" field="docker">
+    <f:entry title="${%Docker Image}" field="dockerImage">
         <f:textbox />
     </f:entry>
 

@@ -49,7 +49,7 @@ marathon(
     url: 'http://marathon-instance',
     forceUpdate: false,
     appid: 'someid',
-    docker: 'mesosphere/jenkins-dev')
+    docker: ['image':'mesosphere/jenkins-dev', 'forcePullImage': true])
 ```
 
 `url` is required and this still depends on a local "marathon.json" file.

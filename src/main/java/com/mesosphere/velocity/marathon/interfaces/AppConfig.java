@@ -4,6 +4,7 @@ import com.mesosphere.velocity.marathon.fields.MarathonLabel;
 import com.mesosphere.velocity.marathon.fields.MarathonUri;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AppConfig {
     /**
@@ -21,21 +22,11 @@ public interface AppConfig {
     String getUrl();
 
     /**
-     * Get the value of whether the Marathon update should be forced. If set to
-     * True, an in-progress deployment of this application will be canceled in
-     * favor of this update. If set to False, an error will occur because the
-     * application has a deployment in progress.
-     *
-     * @return whether to force the Marathon application update
-     */
-    boolean getForceUpdate();
-
-    /**
      * Get the configured docker image name.
      *
      * @return Docker image name
      */
-    String getDocker();
+    Map<String, Object> getDocker();
 
     /**
      * Get the Jenkins credentials id for this configuration.

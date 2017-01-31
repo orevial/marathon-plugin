@@ -1,5 +1,6 @@
 package com.mesosphere.velocity.marathon.interfaces;
 
+import com.mesosphere.velocity.marathon.exceptions.AuthenticationException;
 import com.mesosphere.velocity.marathon.exceptions.MarathonFileInvalidException;
 import com.mesosphere.velocity.marathon.exceptions.MarathonFileMissingException;
 import com.mesosphere.velocity.marathon.impl.MarathonBuilderImpl;
@@ -16,6 +17,11 @@ import java.io.IOException;
  */
 public abstract class MarathonBuilder {
     /**
+     * Local URL value that may be different than what was passed through config.
+     */
+    private String url;
+
+    /**
      * Create a new builder instance from config.
      *
      * @param config Application configuration
@@ -25,13 +31,21 @@ public abstract class MarathonBuilder {
         return new MarathonBuilderImpl(config);
     }
 
+    public String getURL() {
+        return this.url;
+    }
+
+    public void setURL(final String url) {
+        this.url = url;
+    }
+
     /**
      * Update the Marathon application.
      *
      * @return This builder
      * @throws MarathonException
      */
-    public abstract MarathonBuilder update() throws MarathonException;
+    public abstract MarathonBuilder update() throws MarathonException, AuthenticationException;
 
     /**
      * Read in filename as JSON.
@@ -59,6 +73,8 @@ public abstract class MarathonBuilder {
     public abstract MarathonBuilder read()
             throws IOException, InterruptedException, MarathonFileMissingException, MarathonFileInvalidException;
 
+    public abstract JSONObject getJson();
+
     /**
      * Set the JSON for this builder to json. This will overwrite the value set by {@link #read(String)}.
      *
@@ -66,8 +82,6 @@ public abstract class MarathonBuilder {
      * @return This builder
      */
     public abstract MarathonBuilder setJson(final JSONObject json);
-
-    public abstract JSONObject getJson();
 
     /**
      * Set the Jenkins Environment Variables to vars. These are used when building the final Marathon

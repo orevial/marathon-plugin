@@ -6,6 +6,7 @@ import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.mesosphere.velocity.marathon.exceptions.AuthenticationException;
 import com.mesosphere.velocity.marathon.exceptions.MarathonFileInvalidException;
 import com.mesosphere.velocity.marathon.exceptions.MarathonFileMissingException;
 import com.mesosphere.velocity.marathon.fields.MarathonLabel;
@@ -49,6 +50,7 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     private       List<MarathonLabel> labels;
     private       String              appid;
     private       String              docker;
+    private       boolean             dockerForcePull;
     private       String              filename;
     private       String              credentialsId;
     private       boolean             forceUpdate;
@@ -162,6 +164,10 @@ public class MarathonRecorder extends Recorder implements AppConfig {
                 build.setResult(Result.FAILURE);
                 log(logger, "Application Definition is not a file:");
                 log(logger, e.getMessage());
+            } catch (AuthenticationException e) {
+                build.setResult(Result.FAILURE);
+                log(logger, "Authentication to Marathon instance failed:");
+                log(logger, e.getMessage());
             }
 
         }
@@ -184,6 +190,10 @@ public class MarathonRecorder extends Recorder implements AppConfig {
 
     public String getDocker() {
         return docker;
+    }
+
+    public boolean getDockerForcePull() {
+        return dockerForcePull;
     }
 
     public String getCredentialsId() {
@@ -216,6 +226,11 @@ public class MarathonRecorder extends Recorder implements AppConfig {
     @DataBoundSetter
     public void setDocker(@Nonnull final String docker) {
         this.docker = docker;
+    }
+
+    @DataBoundSetter
+    public void setDockerForcePull(@Nonnull final boolean dockerForcePull) {
+        this.dockerForcePull = dockerForcePull;
     }
 
     /**
